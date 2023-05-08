@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Registration Form</title>
+</head>
+<body>
+ <?php
+  // Define variables and initialize with empty values
+  $name = $email = $password = "";
+  
+  // Define error variables and initialize with empty values
+  $nameErr = $emailErr = $passwordErr = "";
+  
+  // Define a variable to track form submission status
+  $formValid = true;
+  
+  if($_SERVER['REQUEST_METHOD'] == 'POST') {
+   // Validate name field
+   if(empty($_POST["name"])) {
+    $nameErr = "Name is required";
+    $formValid = false;
+   } else {
+    $name = test_input($_POST["name"]);
+    // Check if name only contains letters and whitespace
+    if (!preg_match("/^[a-zA-Z ]*$/",$name)) {
+     $nameErr = "Only letters and white space allowed";
+     $formValid = false;
+    }
+   }
+   
+   // Validate email field
+   if(empty($_POST["email"])) {
+    $emailErr = "Email is required";
+    $formValid = false;
+   } else {
+    $email = test_input($_POST["email"]);
+    // Check if email address is well-formed
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+     $emailErr = "Invalid email format";
+     $formValid = false;
+    }
+   }
+   
+   // Validate password field
+   if(empty($_POST["password"])) {
+    $passwordErr = "Password is required";
+    $formValid = false;
+   } else {
+    $password = test_input($_POST["password"]);
+    // Check if password contains at least one lowercase letter, one uppercase letter, one number, and one special character
+    if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/",$password)) {
+     $passwordErr = "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character";
+     $formValid = false;
+    }
+   }
+   
+   // If form data is valid, display success message and user details
+   if($formValid) {
+    echo "<h2>Registration Successful!</h2>";
+    echo "<p>Name: $name</p>";
+    echo "<p>Email: $email</p>";
+    echo "<p>Password: $password</p>";
+   }
+  }
+  
+  // Helper function to sanitize form input
+  function test_input($data) {
+   $data = trim($data);
+   $data = stripslashes($data);
+   $data = htmlspecialchars($data);
+   return $data;
+  }
+ ?>
+	
+ <h2>Registration Form</h2>
+ <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name" value="<?php echo $name;?>" required>
+  <span class="error"><?php echo $nameErr;?></span>
+  <br><br>
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" value="<?php echo $email;?>" required>
+  <span class="error"><?php echo $emailErr;?></span>
